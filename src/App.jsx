@@ -3,12 +3,16 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom';
 import { Home,Cart,ProductDetails,ProductLists,Login,Register } from './pages';
 import { UserProfile,UserOrder,UserOrderDetails,UserCart } from './pages/user';
 import { AdminUser,AdminProducts,AdminEditUser,AdminCreateProduct,AdminChat,AdminAnalytics,AdminEditProduct,AdminOrders,AdminOrderDetails } from './pages/admin';
-import {ProtectRoutes} from './components';
+import {ProtectRoutes,Header,Footer} from './components';
+import UserChatRoute from './components/User/UserChatRoute';
 
 const App = () => {
   return (
     <BrowserRouter>
+    <Header />
     <Routes>
+
+      <Route element={<UserChatRoute />} >
         <Route path='/' element={<Home />} />
         <Route path='/product-list' element={<ProductLists />} />
         <Route path='/product-details/:id' element={<ProductDetails />} />
@@ -17,7 +21,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
-        <Route element={<ProtectRoutes />}>
+        <Route element={<ProtectRoutes admin={false} />}>
 
         <Route path='/user' element={<UserProfile />} />
         <Route path='/user/my-orders' element={<UserOrder />} />
@@ -25,7 +29,11 @@ const App = () => {
         <Route path='/user/order-details' element={<UserCart />} />
 
         </Route>
+        
+        </Route>
 
+
+          {/* admin Routes */}
         <Route element={<ProtectRoutes admin={true} />}>
 
         <Route path='/admin/users' element={<AdminUser />} />
@@ -42,6 +50,7 @@ const App = () => {
         
         <Route path='*' element="Page does not exit" />
     </Routes>
+    <Footer />
     </BrowserRouter>
   )
 }

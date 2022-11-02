@@ -1,19 +1,21 @@
 import React from 'react';
 import { Outlet,Navigate } from 'react-router-dom';
+import UserChat from './User/UserChat';
 
 const ProtectRoutes = (admin) => {
-    let auth = false;
 
     if(admin){
-      let adminAuth = false;
-      if(adminAuth) auth=true;
+      let adminAuth = true;
+      return adminAuth ? <Outlet />:<Navigate to='/login' />
     }else{
       let userAuth = true;
-      if(userAuth) auth= true;
+      return userAuth ? <>
+                                  <Outlet />
+                                  <UserChat />
+                                  </>
+                                  :<Navigate to='/login' />
     }
 
-    //Outlet means the childs elements of this routes
-  return auth ? <Outlet />:<Navigate to='/login' />
 }
 
 export default ProtectRoutes
