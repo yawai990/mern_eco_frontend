@@ -1,8 +1,19 @@
-import React from 'react'
+import React from 'react';
+import { Row,Col } from 'react-bootstrap';
+import { AdminLinks,AdminChatRom } from '../../components';
 
 const AdminChat = () => {
   return (
-    <div>AdminChat</div>
+    <Row className="m-5">
+      <Col md={2}>
+        <AdminLinks />
+      </Col>
+      <Col md={10}>
+        <Row>
+        <AdminChatRom />
+        </Row>
+      </Col>
+    </Row>
   )
 }
 

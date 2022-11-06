@@ -1,0 +1,81 @@
+.check-btn{
+    width: 50px;
+    height: 50px;
+    background-color: rgb(38, 6, 179);
+    position: fixed;
+    right: 12px;
+    bottom: 20px;  
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    color: rgb(237, 237, 237);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.check-btn .close{
+    display: none;
+}
+
+#check:checked ~ .check-btn i {
+    display: block;
+}
+#check:checked ~ .check-btn i.message {
+    display: none;
+}
+
+#check{
+    display: none !important;
+}
+#check:checked ~ .chat-wrapper{
+    opacity: 1;
+    visibility: visible;
+}
+.chat-wrapper{
+    width: 300px;
+    opacity: 0;
+    position: fixed;
+    right: 20px;
+    bottom: 100px;
+    z-index: 20;
+    transition: all 0.4s;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(83, 82, 82, 0.388);
+    visibility: hidden;
+}
+.chat-header{
+    background-color: rgb(38, 6, 179);
+    padding: 13px;
+    margin-bottom: 10px;
+    /* border-radius: 5px 5px 0 0; */
+    color: white;
+};
+.chat-form{
+    padding: 15px !important; 
+    border: 1px solid red;
+}
+.chat-form input,
+.chat-form textarea,
+.chat-form button{
+    margin-bottom: 10px;
+}
+.chat-form textarea{
+    resize: none;
+}
+
+
+.btn:focus,
+.form-control:focus{
+    box-shadow: none !important;
+}
+
+.chat-msg{
+    max-height: 250px;
+    overflow: auto;
+};
+
+
