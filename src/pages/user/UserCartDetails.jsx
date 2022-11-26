@@ -1,87 +1,33 @@
-import {Container,Row,Col,Form, Alert, ListGroup, Button} from 'react-bootstrap';
-import { CartItem } from '../../components';
+import CartDetailCom from './components/CartDetailCom';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart, removeFromCart } from '../../redux/actions/cartAction';
+import axios from 'axios';
 
 const UserCartDetails = () => {
-  return (
-    <Container>
-            <Row className='mt-4'>
-              <h4 className="fw-bold">Order Details</h4>
+  const reduxDispatch= useDispatch();
 
-              <Col md={8}>
+  const cartItems =useSelector(state=>state.cart.cartItems);
+  const quantity = useSelector(state=>state.cart.itemsCount)
+  const cartSubtotal = useSelector(state=>state.cart.cartSubtotal);
+  const userInfo = useSelector(state=>state.userRegisterLogin.userInfo);
 
-                <Row>
-                  <Col md={6}>
-                  <h2>Shipping</h2>
+  const getUser = async (id) => {
+    const {data} = await axios.get(`/api/users/profile/${id}`)
 
-                  <div>
-                    <p><b>Name : </b> Jhon Doe</p>
-                    <p><b>Address : </b> No(123),Mya Street,Yangos</p>
-                    <p><b>Phone : </b> 09222333555</p>
-                    <p><b>Name:</b> Jhon Doe</p>
-                  </div>
-                  </Col>
+    return data;
+  };
 
-                  <Col md={6}>
-                  <h2>Payment Method</h2>
+  const createOrder = async (orderData) =>{
+    const { data } = await axios.post('/api/orders' , orderData );
 
-                  <Form.Select disabled={false}>
-                    <option value='pp'>Paypal</option>
-                    <option value='cod'>Cash On Delivery (delivery may be delayed)</option>
-                  </Form.Select>
-                  </Col>
+    return data;
+  }
 
-                  <Row>
-                    <Col>
-                    <Alert className='mt-3' variant='danger'>No Delivered</Alert>
-                    </Col>
-                    <Col>
-                    <Alert className='mt-3' variant='success'>Paid On 2022-10-20</Alert>
-                    </Col>
-                  </Row>
-
-                </Row>
-
-                    <h3>Order items</h3>
-
-                    <ListGroup variant='flush'>
-                      <CartItem />
-                    </ListGroup>
-
-              </Col>
-
-              <Col md={4}>
-                <h3>Order Summary</h3>
-
-                <ListGroup>
-                  <ListGroup.Item>
-                          <p>Items price(tax included) : <b>$ 120</b></p>
-                  </ListGroup.Item>
-
-                  <ListGroup.Item>
-                          <p>Shipping : <b>included</b></p>
-                  </ListGroup.Item>
-
-                  <ListGroup.Item>
-                          <p>Tax : <b>included</b></p>
-                  </ListGroup.Item>
-
-                  <ListGroup.Item>
-                          <p className='text-danger'>Total Price : <b>$120</b></p>
-                  </ListGroup.Item>
-
-                  <ListGroup.Item>
-
-                    <div className="d-grid gap-2">
-                          <Button variant='danger' size='md' type="button">Pay for the order</Button>
-                    </div>
-                  </ListGroup.Item>
-
-                </ListGroup>
-              </Col>
-
-            </Row>
-    </Container>
-  )
+  return <CartDetailCom 
+                cartItems={cartItems} quantity={quantity} cartSubtotal={cartSubtotal}
+                addToCart={addToCart} removeFromCart={removeFromCart} reduxDispatch={reduxDispatch}
+                userInfo={userInfo} getUser={getUser} createOrder={createOrder}
+  />
 }
 
 export default UserCartDetails

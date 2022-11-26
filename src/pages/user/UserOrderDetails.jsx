@@ -1,87 +1,105 @@
-import {Container,Row,Col,Form,Button,ListGroup,Alert} from 'react-bootstrap';
-import { CartItem } from '../../components';
+import UserOrderDetailsCom from "./components/UserOrderDetail";
+import axios from 'axios';
+import { useSelector } from "react-redux";
+import { loadScript } from "@paypal/paypal-js";
+
+
+const onCancelHandler =()=>{
+  console.log('cancel')
+};
+
+const onErrorHandler =()=>{
+  console.log('error')
+};
+
+const buttons = ( cartSubtotal, cartItems, id , updateStateAfterOrder) =>{
+  return {
+    createOrder: (data,actions) => {
+
+      const orderPaymentLoad = {
+        purchase_units :[
+          {
+             amount : { 
+              currency_code:"USD",
+             value : cartSubtotal ,
+             breakdown : {
+              item_total : {
+                    currency_code : 'USD',
+                    value : cartSubtotal
+              }
+           },
+            },
+             items : cartItems.map(product => ({
+                   name : product.name,
+                  unit_amount : {
+                    currency_code : 'USD',
+                    value : product.price
+                  },
+                  quantity : product.quantity
+                }))
+             }]
+      };
+      return actions.order.create(orderPaymentLoad)
+    },
+    onCancel:  onCancelHandler,
+    onApprove : (data, actions) =>{
+      return actions.order.capture()
+                .then(orderData => {
+
+                  var transaction = orderData.purchase_units[0].payments.captures[0];
+
+                  
+                  if(transaction.status ==="COMPLETED" && Number(transaction.amount.value) === Number(cartSubtotal)){
+                    updateOrder(id)
+                    .then(resp => {
+                      if(resp.isPaid){
+                        updateStateAfterOrder(resp.paidAt)
+                      }
+                    })
+                  }
+                })
+    },
+    onError : onErrorHandler
+  }
+};
+
+const updateOrder = async (orderId) => {
+  const { data } =await axios.put(`/api/orders/product/${orderId}`)
+
+  return data;
+}
 
 const UserOrderDetails = () => {
-  return (
-  <Container>
-  <Row className='mt-4'>
-    <h4 className="fw-bold">Cart Details</h4>
 
-    <Col md={8}>
+  const userInfo = useSelector(state => state.userRegisterLogin.userInfo);
 
-      <Row>
-        <Col md={6}>
-        <h2>Shipping</h2>
+  const getUser = async (id)=>{
+    const {data} = await axios.get(`/api/users/profile/${id}`);
 
-        <div>
-          <p><b>Name : </b> Jhon Doe</p>
-          <p><b>Address : </b> No(123),Mya Street,Yangos</p>
-          <p><b>Phone : </b> 09222333555</p>
-          <p><b>Name:</b> Jhon Doe</p>
-        </div>
-        </Col>
+    return data;
+  };
 
-        <Col md={6}>
-        <h2>Payment Method</h2>
+  const getOrder = async (orderId) =>{
+    const { data } = await axios.get(`/api/orders/user/${orderId}`);
 
-        <Form.Select>
-          <option value='pp'>Paypal</option>
-          <option value='cod'>Cash On Delivery (delivery may be delayed)</option>
-        </Form.Select>
-        </Col>
+    return data;
+  };
 
-        <Row>
-          <Col>
-          <Alert className='mt-3' variant='danger'>No Delivered. In order to make order, kindly fill out your profile with correct address,city etc.</Alert>
-          </Col>
-          <Col>
-          <Alert className='mt-3' variant='success'>Paid On 2022-10-20</Alert>
-          </Col>
-        </Row>
+  const loadPaypalScript = ( cartSubtotal, cartItems, id , updateStateAfterOrder) =>{
+    loadScript({ "client-id": "AbSLkELwqf0O3W6MFzP8Z-ZKONVTGBkG_ObCiVaTMfZX3pxC3-HiY7tPQg4i1LeFKX4KqukV7mkD_vG6" })
+    .then(paypal =>{
+      paypal
+      .Buttons(buttons( cartSubtotal, cartItems, id , updateStateAfterOrder))
+      .render("#paypal-container-element");
+    })
+    .catch(err => console.error('Failed to load the Paypal SDK',err))
+  };
 
-      </Row>
 
-          <h3>Order items</h3>
 
-          <ListGroup variant='flush'>
-            <CartItem />
-          </ListGroup>
-
-    </Col>
-
-    <Col md={4}>
-      <h3>Order Summary</h3>
-
-      <ListGroup>
-        <ListGroup.Item>
-                <p>Items price(tax included) : <b>$ 120</b></p>
-        </ListGroup.Item>
-
-        <ListGroup.Item>
-                <p>Shipping : <b>included</b></p>
-        </ListGroup.Item>
-
-        <ListGroup.Item>
-                <p>Tax : <b>included</b></p>
-        </ListGroup.Item>
-
-        <ListGroup.Item>
-                <p className='text-danger'>Total Price : <b>$120</b></p>
-        </ListGroup.Item>
-
-        <ListGroup.Item>
-
-          <div className="d-grid gap-2">
-                <Button variant='danger' size='md' type="button">Pay for the order</Button>
-          </div>
-        </ListGroup.Item>
-
-      </ListGroup>
-    </Col>
-
-  </Row>
-</Container>
-)
+  return <UserOrderDetailsCom userInfo={userInfo} getUser={getUser}
+                getOrder={getOrder} loadScript={loadScript} loadPaypalScript={loadPaypalScript}
+                    />
 }
 
 export default UserOrderDetails

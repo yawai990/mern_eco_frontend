@@ -2,37 +2,35 @@ import { Card, Button,Row,Col } from "react-bootstrap";
 import { Rating } from "react-simple-star-rating";
 import { LinkContainer } from "react-router-bootstrap";
 
-const ProductForListComponent = () => {
+const ProductForListComponent = ({productLists}) => {
+  
   return (
     <>
       {
-        Array.from({length:5}).map((_,ind)=>(
+        productLists.map((product,ind)=>(
     
-    <Card style={{marginTop:'30px',marginBottom:'50px'}} key={ind}>
+    <Card style={{marginTop:'30px',marginBottom:'50px'}} key={product._id}>
 
       <Row>
 
         <Col lg={5}>
-        <Card.Img variant="top" src="/images/tablet.jpg" style={{height:'260px',objectFit:'cover'}} />
+        <Card.Img variant="top" src={productLists[ind]?.images[0]?.path ? productLists[ind].images[0].path :''} style={{height:'260px',objectFit:'cover'}} />
         </Col>
 
         <Col lg={7}>
         <Card.Body>
-        <Card.Title>Card Title</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
+        <Card.Title>{product.name}</Card.Title>
+        <Card.Text>{product.description}</Card.Text>
 
         <Card.Text>
-          <Rating initialValue={5} size={20} readonly /> (10)
+          <Rating initialValue={product.rating} size={20} readonly /> (10)
         </Card.Text>
 
         
         <Card.Text className="h4">
-          $545
+          ${product.price}
 
-          <LinkContainer to="/product-details">
+          <LinkContainer to={`/product-details/${product._id}`}>
         <Button variant="danger" className='ms-2 btn-sm'>See Product</Button>
         </LinkContainer>
         </Card.Text>
